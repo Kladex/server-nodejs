@@ -1,15 +1,17 @@
 import { Request, Response } from "express";
-import { pool } from "../databases/database";
+
+import {
+  getAllproductFromDb,
+  getProductByIDFromDb,
+} from "../databases/product.db";
 
 const getAllProducts = async (req: Request, res: Response) => {
   const page = req.query.page || 1;
   const limit = req.query.limit || 10;
   let offset = (+page - 1) * +limit;
 
-  const data = await pool.query("select * from products limit $1 offset $2", [
-    limit,
-    offset,
-  ]);
+  const data = await getAllproductFromDb(limit, offset);
+
   const allProducts = data.rows;
   const hasProduct = allProducts.length;
 
@@ -22,9 +24,8 @@ const getAllProducts = async (req: Request, res: Response) => {
 
 const getProductByID = async (req: Request, res: Response) => {
   const productId = req.params.productId;
-  const data = await pool.query("select * from products where product_id=$1", [
-    productId,
-  ]);
+  const data = await getProductByIDFromDb(productId);
+
   const hasProduct = data.rows.length;
   const productByID = data.rows;
 
